@@ -1,0 +1,10 @@
+# Example which fails due to bug in OpenStack
+clouds:
+  ovh:
+    profile: ovh
+    auth:
+      auth_url: https://auth.cloud.ovh.net/v3/
+      token: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+    region_name: FAK1
+    interface: public
+    identity_api_version: 3

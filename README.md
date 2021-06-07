@@ -10,4 +10,11 @@ Code for the Infrastructure Via Code Experimental Learning Project at https://ww
 
 Source code of scripts described in [Tokens for OVH v1](https://www.wildtechgarden.ca/projects/experimental-learning/infrastructure-via-code/tokens-for-ovh-v1/).
 
-You would obviously need to modify the ``ovh.conf`` in the directory containing the script with useable credentials.
+You would obviously need to modify the ``ovh.conf`` in the directory containing the script to contain usable credentials.
+
+#### Set-002
+
+Source code of scripts described in [First Steps With the OpenStack SDK](https://www.wildtechgarden.ca/projects/experimental-learning/infrastructure-via-code/first-steps-with-openstacksdk/).
+
+You would obviously need to modify the ``clouds.yaml`` in the directory containing to script to contain correct data for the required parameters.
+Also, for X-005 you will need to replace the configuration with details that work for your environment.
