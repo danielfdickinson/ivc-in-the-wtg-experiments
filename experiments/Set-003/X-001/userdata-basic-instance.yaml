@@ -1,0 +1,27 @@
+#cloud-config
+disable_root: true
+preserve_hostname: false
+manage_etc_hosts: true
+ssh_pwauth: false
+users:
+  - name: aideraan
+    groups:
+      - adm
+      - staff
+      - sudo
+    homedir: /local-home/aideraan
+    lock_passwd: false
+    hashed_passwd: $6$rounds=4096$EkUidTZvBnj.L71$muCL90UUamedyWXuFSEpSNR4DT5yEbfXfyRiWmGbSvtwPChpMmZ64u6yDELP5FG2bhPOtN8FkM8sK8t6GvKp91
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKXtEqNY9ib6XNsQwrOTwoX26hzUYUXfl5oTIRUangM5 provision@ovhpci
+timezone: America/Toronto
+write_files:
+  - path: /etc/byobu/autolaunch
+  - path: /etc/ssh/sshd_config.d/pubkey_only.conf
+    content: |
+      PasswordAuthentication no
+      PubkeyAuthentication yes
+  - path: /etc/ssh/sshd_config.d/alternate_port.conf
+    content: |
+      Port 22712
