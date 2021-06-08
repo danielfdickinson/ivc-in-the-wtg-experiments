@@ -17,4 +17,4 @@ You would obviously need to modify the ``ovh.conf`` in the directory containing 
 Source code of scripts described in [First Steps With the OpenStack SDK](https://www.wildtechgarden.ca/projects/experimental-learning/infrastructure-via-code/first-steps-with-openstacksdk/).
 
 You would obviously need to modify the ``clouds.yaml`` in the directory containing to script to contain correct data for the required parameters.
-Also, for X-005 you will need to replace the ``basic-instance.ini`` configuration with details that work for your environment.
+Also, for X-005 you will need to replace the ``basic-instance.ini`` configuration with details that work for your environment. Finally, you would need to adjust ``userdata-basic-instance.yaml`` with the userdata suitable for your instances (or modify the config to use multiple userdata files, if you could use the same userdata for all).
