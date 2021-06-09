@@ -1,0 +1,27 @@
+#cloud-config
+disable_root: true
+preserve_hostname: false
+manage_etc_hosts: true
+ssh_pwauth: false
+users:
+  - name: aideraan
+    groups:
+      - adm
+      - staff
+      - sudo
+    homedir: /local-home/aideraan
+    lock_passwd: false
+    hashed_passwd: {{ admin_user_password }}
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - {{ admin_user_ssh_pubkey }}
+timezone: America/Toronto
+write_files:
+  - path: /etc/byobu/autolaunch
+  - path: /etc/ssh/sshd_config.d/pubkey_only.conf
+    content: |
+      PasswordAuthentication no
+      PubkeyAuthentication yes
+  - path: /etc/ssh/sshd_config.d/alternate_port.conf
+    content: |
+      Port 27221
