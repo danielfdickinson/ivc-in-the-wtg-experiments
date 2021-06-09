@@ -51,7 +51,7 @@ def main():
             if (section + "-userdata-vars") in config:
                 userdata_vars = config[section + "-userdata-vars"]
             else:
-                userdata_vars = config[configparser.DEFAULTSECT]
+                userdata_vars = config[config.default_section]
             userdatafile = config[section]["userdata"]
 
             print(
