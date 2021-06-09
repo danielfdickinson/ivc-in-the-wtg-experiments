@@ -27,9 +27,12 @@ def read_config(
 
     return config
 
+
 def apply_userdata_template(userdatafile, userdata_vars, server_name):
     jinja_env = Environment(
-        loader=FileSystemLoader(os.getcwd()), autoescape=select_autoescape(), undefined=StrictUndefined
+        loader=FileSystemLoader(os.getcwd()),
+        autoescape=select_autoescape(),
+        undefined=StrictUndefined,
     )
     jinja_template = jinja_env.get_template(userdatafile)
 
@@ -47,11 +50,17 @@ def main():
             userdata_vars = {}
             if (section + "-userdata-vars") in config:
                 userdata_vars = config[section + "-userdata-vars"]
+            else:
+                userdata_vars = config[configparser.DEFAULTSECT]
             userdatafile = config[section]["userdata"]
 
-            print("    Userdata for server {server_name}:".format(server_name=server_name))
+            print(
+                "    Userdata for server {server_name}:".format(server_name=server_name)
+            )
             try:
-                userdata = apply_userdata_template(userdatafile, userdata_vars, server_name)
+                userdata = apply_userdata_template(
+                    userdatafile, userdata_vars, server_name
+                )
 
                 print(userdata)
             except UndefinedError as ue:
