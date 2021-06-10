@@ -17,7 +17,7 @@ def read_config(
     configfile="create-instances.ini",
 ):
 
-    config = configparser.ConfigParser(defaults=defaults)
+    config = configparser.ConfigParser(defaults=defaults, interpolation=None)
 
     readfile = config.read(configfile)
 
