@@ -14,7 +14,9 @@ users:
     hashed_passwd: {{ admin_user_password }}
     shell: /bin/bash
     ssh_authorized_keys:
-      - {{ admin_user_ssh_pubkey }}
+    {%- for admin_user_ssh_pubkey in admin_user_ssh_pubkeys.split(":") %}
+      - {{ admin_user_ssh_pubkey -}}
+    {% endfor %}
 timezone: America/Toronto
 write_files:
   - path: /etc/byobu/autolaunch
