@@ -4,12 +4,12 @@ preserve_hostname: false
 manage_etc_hosts: true
 ssh_pwauth: false
 users:
-  - name: aideraan
+  - name: anadmin
     groups:
       - adm
       - staff
       - sudo
-    homedir: /local-home/aideraan
+    homedir: /local-home/anadmin
     lock_passwd: false
     hashed_passwd: {{ admin_user_password }}
     shell: /bin/bash
