@@ -1,0 +1,13 @@
+#!/bin/sh
+
+umask 0077
+echo "AdminAuth: acngadmin:$(vault kv get -field=acngadmin secret/pytest001/application_secrets)" >/etc/apt-cacher-ng/security.conf
+chgrp apt-cacher-ng /etc/apt-cacher-ng/security.conf
+
+systemctl enable --now apt-cacher-ng
+
+umask 0022
+echo 'Acquire::http::Proxy "http://localhost:3142/";
+Acquire::https::Proxy "http://localhost:3142/";' >/etc/apt/apt.conf.d/02proxy
+
+sed -i -e '1,$s/https/http/g' /etc/apt/sources.list.d/hashicorp.list

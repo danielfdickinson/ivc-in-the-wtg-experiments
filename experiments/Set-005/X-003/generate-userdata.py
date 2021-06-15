@@ -1,6 +1,9 @@
 import base64
+import collections
 import gzip
 import os
+import pathlib
+from posixpath import isabs
 import sys
 
 import configparser
@@ -30,25 +33,31 @@ def read_config(
     return config
 
 
-def apply_userdata_template(userdatafile, userdata_vars, server_name):
+def apply_userdata_template(userdatafile, userdata_vars, server_name=""):
     jinja_env = Environment(
-        loader=FileSystemLoader(os.getcwd()),
+        loader=FileSystemLoader(
+            os.path.join(os.getcwd(), os.path.dirname(userdatafile))
+        ),
         autoescape=select_autoescape(),
         undefined=StrictUndefined,
     )
-    jinja_template = jinja_env.get_template(userdatafile)
+    jinja_template = jinja_env.get_template(os.path.basename(userdatafile))
 
-    userdata_vars["server_name"] = server_name
+    if server_name != "":
+        userdata_vars["server_name"] = server_name
 
     return jinja_template.render(userdata_vars)
 
 
-def get_file_data(config, section, userdata_vars):
-    verbatim_files_dirs = config[section]["verbatim_files_dirs"].split(":")
+def get_file_data(config, section, dirlist, userdata_vars, templates=False):
+    verbatim_files_dirs = config[section][dirlist].split(":")
 
-    userdata_vars["files_to_write"] = []
-    userdata_vars["write_files"] = {}
+    if not "files_to_write" in userdata_vars:
+        userdata_vars["files_to_write"] = []
+    if not "write_files" in userdata_vars:
+        userdata_vars["write_files"] = {}
     for verbatim_files_dir in verbatim_files_dirs:
+        verbatim_files_dir = os.path.normpath(verbatim_files_dir)
         for verbatim_dirpath, __, verbatim_filenames in os.walk(verbatim_files_dir):
             for verbatim_filename in verbatim_filenames:
                 local_path = os.path.join(verbatim_dirpath, verbatim_filename)
@@ -60,7 +69,12 @@ def get_file_data(config, section, userdata_vars):
                     print("  Error: Files greater than 10k can't be part of userdata")
                     return None
                 target_file = open(local_path, "rb")
-                target_base_content = target_file.read()
+                if templates:
+                    target_base_content = bytes(
+                        apply_userdata_template(local_path, userdata_vars), "utf-8"
+                    )
+                else:
+                    target_base_content = target_file.read()
                 target_file.close()
                 target_base_len = len(target_base_content)
                 target_gz_content = gzip.compress(target_base_content)
@@ -70,7 +84,12 @@ def get_file_data(config, section, userdata_vars):
                     target_path.replace("/", "-").replace(".", "-").removeprefix("-")
                 )
                 userdata_vars["write_files"][target_var_name] = {}
-                userdata_vars["write_files"][target_var_name]["path"] = target_path
+                orig_path = pathlib.PurePath(target_path)
+                if orig_path.is_absolute:
+                    if orig_path.drive != "":
+                        orig_path = orig_path.relative_to(orig_path.drive)
+                posix_path = orig_path.as_posix()
+                userdata_vars["write_files"][target_var_name]["path"] = posix_path
                 if userdata_vars.get(target_var_name + "-permissions"):
                     userdata_vars["write_files"][target_var_name]["permissions"] = (
                         '"' + userdata_vars[target_var_name + "-permissions"] + '"'
@@ -106,6 +125,10 @@ def get_file_data(config, section, userdata_vars):
 def copy_userdata_vars(userdata_vars):
     new_dict = {}
     for key, val in userdata_vars.items():
+        if isinstance(val, collections.abc.Mapping):
+            val = copy_userdata_vars(val)
+        elif isinstance(val, list):
+            val = copy_userdata_vars(val)
         new_dict[key] = val
     return new_dict
 
@@ -118,15 +141,35 @@ def main():
             server_name = section
 
             userdata_vars = {}
+            userdata = None
+
             if (section + "-userdata-vars") in config:
-                userdata_vars = config[section + "-userdata-vars"]
+                userdata_vars = copy_userdata_vars(config[section + "-userdata-vars"])
             else:
-                userdata_vars = config[config.default_section]
+                userdata_vars = copy_userdata_vars(config[config.default_section])
 
             userdatafile = config[section]["userdata"]
-            userdata_vars = get_file_data(
-                config, section, copy_userdata_vars(userdata_vars)
-            )
+            if "verbatim_files_dirs" in config[section] and (
+                config[section]["verbatim_files_dirs"] != ""
+            ):
+                userdata_vars = get_file_data(
+                    config, section, "verbatim_files_dirs", userdata_vars
+                )
+            if "template_files_dirs" in config[section] and (
+                config[section]["template_files_dirs"] != ""
+            ):
+                userdata_vars = get_file_data(
+                    config,
+                    section,
+                    "template_files_dirs",
+                    userdata_vars,
+                    templates=True,
+                )
+            else:
+                if not "files_to_write" in userdata_vars:
+                    userdata_vars["files_to_write"] = []
+                if not "write_files" in userdata_vars:
+                    userdata_vars["write_files"] = {}
 
             if userdata_vars is None:
                 continue
@@ -134,6 +177,7 @@ def main():
             print(
                 "    Userdata for server {server_name}:".format(server_name=server_name)
             )
+
             try:
                 userdata = apply_userdata_template(
                     userdatafile, userdata_vars, server_name

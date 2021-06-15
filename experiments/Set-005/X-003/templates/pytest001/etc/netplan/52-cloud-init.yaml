@@ -1,0 +1,13 @@
+network:
+  version: 2
+  ethernets:
+    ens4:
+      dhcp4: false
+      addresses:
+        - {{ net_private_ipv4_cidr_addr }}
+      nameservers:
+        search:
+          - {{ net_private_domain }}
+          - 32.168.192.in-addr.arpa
+        addresses:
+          - {{ net_private_dns_v4 }}

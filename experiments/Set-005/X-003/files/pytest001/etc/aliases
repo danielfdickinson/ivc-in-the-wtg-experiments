@@ -1,0 +1,5 @@
+# See man 5 aliases for format
+postmaster:     anadmin
+root:           anadmin@example.com
+vault:          root
+logwatch:       root
