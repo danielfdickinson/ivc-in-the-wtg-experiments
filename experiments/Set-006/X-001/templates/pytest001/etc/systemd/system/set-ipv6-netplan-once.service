@@ -1,0 +1,6 @@
+[Unit]
+Description=Set Netplan for IPv6 Once
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/set-ipv6-netplan-once.sh

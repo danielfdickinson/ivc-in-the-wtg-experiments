@@ -1,0 +1,113 @@
+#cloud-config
+disable_root: true
+preserve_hostname: false
+manage_etc_hosts: true
+ssh_pwauth: false
+users:
+  - name: {{ admin_username }}
+    groups:
+      - adm
+      - staff
+      - sudo
+    homedir: /local-home/{{ admin_username }}
+    lock_passwd: false
+    hashed_passwd: {{ admin_user_password }}
+    shell: /bin/bash
+    ssh_authorized_keys:
+    {%- for admin_user_ssh_pubkey in admin_user_ssh_pubkeys.split(":") %}
+      - {{ admin_user_ssh_pubkey -}}
+    {% endfor %}
+timezone: {{ instance_timezone }}
+hostname: {{ instance_hostname }}
+fqdn: {{ instance_fqdn }}
+{%- if ntp_client %}
+ntp:
+  {%- if ntp_client == "chrony" %}
+  ntp_client: chrony
+  enabled: true
+  {%- else %}
+  enabled: true
+  {%- endif %}
+  {%- if ntp_servers %}
+  servers:
+    {%- for ntp_server in ntp_servers.split() %}
+    - {{ ntp_server -}}
+    {% endfor %}
+  {%- endif %}
+{%- endif %}
+package_update: true
+package_upgrade: true
+{%- if packages %}
+packages:
+  {%- for package in packages.split() %}
+  - {{ package -}}
+  {% endfor %}
+{%- endif %}
+package_reboot_if_required: true
+{%- if mounts %}
+mounts:
+  {%- for mount in mounts.split("\n") %}
+  - {{ mount -}}
+  {%- endfor -%}
+{%- endif -%}
+{%- if files_to_write %}
+  {%- for ftw in files_to_write %}
+  - path: {{ write_files[ftw].path }}
+    {%- if write_files[ftw]['permissions'] %}
+    permissions: {{ write_files[ftw].permissions }}
+    {%- endif %}
+    {%- if write_files[ftw]['owner'] %}
+    owner: {{ write_files[ftw].owner }}
+    {%- endif %}
+    {%- if write_files[ftw]['append'] %}
+    append: true
+    {%- endif %}
+    encoding: {{ write_files[ftw].encoding }}
+    content: |
+      {{ write_files[ftw].content }}
+  {%- endfor -%}
+{%- endif -%}
+{# write_files:
+  - path: /etc/netplan/50-cloud-init.yaml
+    content: |
+      {{ netplan_cloud_init }}
+    encoding: gz+b64
+  - path: /etc/ssl/vault/ca-private.internal.danielfdickinson.ca.crt
+    content: |
+      {{ ca_private_certificate }}
+    encoding: gz+b64
+  - path: /etc/ssl/vault/dfdgw.dfdintraovh.danielfdickinson.ca.crt
+    content: |
+      {{ dfdgw_ssl_private_certificate }}
+    encoding: gz+b64
+  - path: /etc/ssl/postfix/client@dfdgw.dfdintraovh.danielfdickinson.ca.crt
+    content: |
+      {{ dfdgw_ssl_private_client_certificate }}
+    encoding: gz+b64
+  - path: /etc/systemd/system/set-ipv6-netplan-once.timer
+    content: |
+      {{ set_ip6_netplan_timer }}
+    encoding: gz+b64
+  - path: /usr/local/sbin/set-ipv6-netplan-once.sh
+    content: |
+      {{ set_ip6_netplan_sh }}
+    encoding: gz+b64
+    permissions: "0755"
+  - path: /etc/dnsmasq.d/custom.conf
+    content: |
+      {{ dnsmasq_custom_conf }}
+    encoding: gz+b64
+runcmd:
+  - netplan apply
+  - systemctl enable --now set-ipv6-netplan-once.timer
+  - systemctl restart ufw
+  - sh -c "echo 'allow 10.0.0.0/16' >>/etc/chrony/chrony.conf"
+  - systemctl restart chrony
+  - mkdir -p /var/lib/dnsmasq
+  - chown dnsmasq /var/lib/dnsmasq
+  - chown -R vault:vault /etc/ssl/vault
+  - systemctl enable --now vault
+  - systemctl disable --now apt-cacher-ng
+  - sysctl net.ipv4.ip_forward=1
+  - newaliases
+  - postmap hash:/etc/postfix/vmailbox #}

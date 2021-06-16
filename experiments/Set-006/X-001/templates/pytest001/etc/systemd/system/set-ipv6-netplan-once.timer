@@ -1,0 +1,9 @@
+[Unit]
+Description=Look for IPv6 every 60s after guaranteed expiry (TTL)
+
+[Timer]
+OnBootSec={{ ip6_ttl }}
+OnUnitActiveSec=60
+
+[Install]
+WantedBy=timers.target
