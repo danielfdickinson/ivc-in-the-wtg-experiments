@@ -32,3 +32,11 @@ Source code of scripts described in [Adding Trivial Templating](https://www.wild
 #### Set-005
 
 Source code of scripts, configs, and files described in [Completing OpenStack SDK With Templating](https://www.wildtechgarden.ca/projects/experimental-learning/infrastructure-via-code/completing-openstacksdk-with-templating/). There is the usual note about updating configuration to and userdata to suit your environment. For ``X-002`` and beyond, you will also need to update the additional files to suit your situation. (The additional files are applied verbatim, except compressed and encoded).
+
+##### Set-006
+
+This is the initial copy from Set-005 of source code, configs, and files described in [Completing OpenStackSDK with Templating](https://www.wildtechgarden.ca/projects/experimental-learning/infrastructure-via-code/completing-openstacksdk-with-templating/) final script. Since that project has been halt (see that page for the reasons), this has not been taken beyond some minor modifications.
+
+## That's All Folks
+
+Hopefully you found the referenced website and these files useful.
