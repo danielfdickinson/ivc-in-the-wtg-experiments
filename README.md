@@ -2,6 +2,10 @@
 
 Code for the Infrastructure Via Code Experimental Learning Project at https://www.wildtechgarden.ca/projects/experimental-learning/infrastructure-via-code/
 
+## ARCHIVED
+
+This project is archived and may be out-of-date or contain no longer accurate information
+
 ## What Is In the Repo?
 
 ### /experiments
@@ -35,7 +39,7 @@ Source code of scripts, configs, and files described in [Continuing OpenStack SD
 
 ##### Set-006
 
-This is the initial copy from Set-005 of source code, configs, and files described in [Completing OpenStackSDK with Templating](https://www.wildtechgarden.ca/projects/experimental-learning/infrastructure-via-code/completing-openstacksdk-with-templating/) final script. Since that project has been halt (see that page for the reasons), this has not been taken beyond some minor modifications.
+This is the initial copy from Set-005 of source code, configs, and files described in [Completing OpenStackSDK with Templating](https://www.wildtechgarden.ca/projects/experimental-learning/infrastructure-via-code/completing-openstacksdk-with-templating/) final script. Since that project has been halted (see that page for the reasons), this has not been taken beyond some minor modifications.
 
 ## That's All Folks
 
